@@ -38,6 +38,6 @@ back to `/Applications` (or download it from paseo.sh).
 
 ## Candidate upstream PRs to carry
 
-- Inline rename for workspaces: getpaseo/paseo#4643 (double-click sidebar rename + shortcut),
-  #8652 (rename in workspace header menu), #8121 (rename shortcut).
-- Voice mode: #8411 (stop voice mode rewriting the system prompt), #9051, #5408.
+- Inline rename for workspaces: [#4643](https://github.com/getpaseo/paseo/pull/4643) (double-click sidebar rename + shortcut),
+  [#8652](https://github.com/getpaseo/paseo/pull/8652) (rename in workspace header menu), [#8121](https://github.com/getpaseo/paseo/pull/8121) (rename shortcut).
+- Voice mode: [#8411](https://github.com/getpaseo/paseo/pull/8411) (stop voice mode rewriting the system prompt), [#9051](https://github.com/getpaseo/paseo/pull/9051), [#5408](https://github.com/getpaseo/paseo/pull/5408).
