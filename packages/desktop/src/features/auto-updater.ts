@@ -224,7 +224,8 @@ class ElectronAppUpdateRuntime implements AppUpdateRuntime {
 
 const appUpdateService = createAppUpdateService({
   runtime: new ElectronAppUpdateRuntime(),
-  isPackaged: () => app.isPackaged,
+  // okke fork: never pull upstream releases over a fork build; fork/sync.sh builds and installs.
+  isPackaged: () => false,
   now: () => Date.now(),
   bucket: async () => bucketFromStagingUserId(await getStagingUserId()),
   reportCheckError: (error) => {
