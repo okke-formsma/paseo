@@ -12,7 +12,7 @@ npm ci --no-audit --no-fund
 CSC_IDENTITY_AUTO_DISCOVERY=false \
 NODE_OPTIONS=--max-old-space-size=8192 \
   npm run build:desktop -- --publish never --mac --"$arch" --dir \
-    -c.mac.identity=- -c.mac.notarize=false
+    -c.mac.identity=- -c.mac.notarize=false -c.mac.hardenedRuntime=false
 
 out=packages/desktop/release/mac-$arch/Paseo.app
 [[ "$arch" == x64 ]] && out=packages/desktop/release/mac/Paseo.app
