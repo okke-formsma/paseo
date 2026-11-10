@@ -113,7 +113,14 @@ const append = defineRpc({
   output: z.object({ seq: z.number(), epoch: z.string() }),
 });
 
+const rename = defineRpc({
+  name: "rename",
+  input: z.object({ agentId: z.string(), title: z.string() }),
+  output: z.object({ title: z.string() }),
+});
+
 export default function contribute(server: PluginServerContext) {
+  server.handle(rename, ({ agentId, title }, { paseo }) => paseo.agents.ref(agentId).setTitle(title));
   server.handle(create, async ({ path }, { paseo }) => {
     const workspace = await paseo.workspaces.create({
       source: { kind: "directory", path },
@@ -178,6 +185,10 @@ export default function contribute(server: PluginServerContext) {
       client.invokePluginRpc("paseo-api", "append", { agentId, status: "running" }),
     ).resolves.toEqual({ seq: expect.any(Number), epoch: expect.any(String) });
     await client.invokePluginRpc("paseo-api", "append", { agentId, status: "complete" });
+    await expect(
+      client.invokePluginRpc("paseo-api", "rename", { agentId, title: "  Renamed by plugin  " }),
+    ).resolves.toEqual({ title: "Renamed by plugin" });
+    expect((await client.fetchAgent(agentId))?.agent.title).toBe("Renamed by plugin");
     const timeline = await client.fetchAgentTimeline(agentId, { projection: "projected" });
     expect(timeline.entries.filter((entry) => entry.item.type === "plugin")).toEqual([
       expect.objectContaining({

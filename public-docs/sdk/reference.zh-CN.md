@@ -96,6 +96,7 @@ nav: API 参考
 | `refresh(requestId?)`                          | `PaseoAgentRefetchResult \| null`         | 获取当前的 Agent 及其所在项目。                                                                                                               |
 | `send(text, options?)`                         | `Promise<void>`                           | 在 daemon 接受提示词后 resolve。                                                                                                              |
 | `respondToPermission(options)`                 | `Promise<void>`                           | 按 `requestId` 以允许或拒绝的 `response` 回应一个待处理的权限请求。                                                                           |
+| `setTitle(title)`                              | `{ title }`                               | 重命名 Agent，效果与在应用中重命名其标签页相同；所有已连接的客户端都会显示新标题。标题会去除首尾空白；空标题会被拒绝。                        |
 | `run(text, options?)`                          | `PaseoAgentRunResult`                     | 发送提示词并等待该轮结束。`timeoutMs` 控制等待时间，默认 10 分钟。                                                                            |
 | `waitForFinish(timeoutMs?)`                    | `PaseoAgentRunResult`                     | 等待当前轮次结束，包括初始提示词。默认超时：10 分钟。                                                                                         |
 | `commands(options?)`                           | `PaseoAgentCommandsResult`                | 向正在运行的会话查询它的斜杠命令和技能，包括内置的。选项：`requestId`。                                                                       |

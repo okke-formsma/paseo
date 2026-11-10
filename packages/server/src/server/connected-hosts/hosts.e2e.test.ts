@@ -586,6 +586,31 @@ import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
+test("an agent handle from a connected host renames the agent on that host", async () => {
+  const b = await daemon({ agentClients: createTestAgentClients() });
+  const a = await daemon();
+  const origin = await api(a);
+  const destination = await api(b);
+  await origin.paseo.hosts.add({ connection: `127.0.0.1:${b.port}` });
+  const serverId = (await online(origin.paseo)).hosts[0]!.serverId!;
+  const workspace = await destination.paseo.workspaces.create({
+    source: { kind: "directory", path: b.staticDir },
+  });
+  const agent = await workspace.agents.create({
+    config: { provider: "claude/claude-test" },
+    title: "Before rename",
+  });
+  const remote = await origin.paseo.hosts.client(serverId);
+  try {
+    await expect(remote.agents.ref(agent.id).setTitle("Renamed from A")).resolves.toEqual({
+      title: "Renamed from A",
+    });
+  } finally {
+    await remote.dispose();
+  }
+  expect((await destination.client.fetchAgent(agent.id))?.agent.title).toBe("Renamed from A");
+});
+
 test("CLI host commands manage the selected daemon and emit secret-free structured output", async () => {
   const a = await daemon();
   const cli = async (...args: string[]) =>

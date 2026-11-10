@@ -1086,6 +1086,48 @@ test("agent handles delegate create, send, timeline refetch, archive, and local 
   await client.close();
 });
 
+test("agent handles rename the agent through the existing update RPC", async () => {
+  const { client, ws } = await connectClient();
+  const agent = client.agents.ref("agent_sdk");
+
+  const renamed = agent.setTitle("  Review the parser  ");
+  const request = parseSentSessionMessage(ws.sent.at(-1));
+  expect(request).toMatchObject({
+    type: "update_agent_request",
+    agentId: "agent_sdk",
+    name: "Review the parser",
+  });
+  expect(request).not.toHaveProperty("labels");
+  ws.message(
+    sessionMessage({
+      type: "update_agent_response",
+      payload: { requestId: request.requestId, agentId: "agent_sdk", accepted: true, error: null },
+    }),
+  );
+  await expect(renamed).resolves.toEqual({ title: "Review the parser" });
+
+  const rejected = agent.setTitle("Missing agent");
+  const rejectedRequest = parseSentSessionMessage(ws.sent.at(-1));
+  ws.message(
+    sessionMessage({
+      type: "update_agent_response",
+      payload: {
+        requestId: rejectedRequest.requestId,
+        agentId: "agent_sdk",
+        accepted: false,
+        error: "Agent not found",
+      },
+    }),
+  );
+  await expect(rejected).rejects.toThrow("Agent not found");
+
+  const sentBefore = ws.sent.length;
+  await expect(agent.setTitle("   ")).rejects.toThrow("Agent title cannot be empty");
+  expect(ws.sent).toHaveLength(sentBefore);
+
+  await client.close();
+});
+
 test("agent handles list the session's own commands through the existing daemon RPC", async () => {
   const { client, ws } = await connectClient();
   const agent = client.agents.ref("agent_sdk");

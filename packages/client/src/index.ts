@@ -447,6 +447,11 @@ export interface PaseoAgentHandle {
   setOptions(patch: Record<string, unknown>): Promise<void>;
   /** Top-level keys replace; `null` removes the key. Needs a host with `entityMetadata`. */
   setMetadata(patch: Record<string, JsonValue>): Promise<void>;
+  /**
+   * Renames the agent, as renaming its tab in the app does; every connected client shows the
+   * new title. The title is trimmed and must not be empty.
+   */
+  setTitle(title: string): Promise<{ title: string }>;
   /** Sends a prompt and resolves when that turn finishes or needs attention. */
   run(text: string, options?: PaseoAgentRunOptions): Promise<PaseoAgentRunResult>;
   /** Waits for the current turn, including one started with `prompt`. */
@@ -1153,6 +1158,13 @@ function createAgentHandleFactory(
       setMetadata: async (patch) => {
         const metadata = await daemonClient.setAgentMetadata(id, patch);
         if (current) current = { ...current, metadata };
+      },
+      setTitle: async (title) => {
+        const trimmed = title.trim();
+        if (!trimmed) throw new Error("Agent title cannot be empty");
+        await daemonClient.updateAgent(id, { name: trimmed });
+        if (current) current = { ...current, title: trimmed };
+        return { title: trimmed };
       },
       respondToPermission: async ({ requestId, response }) => {
         await daemonClient.respondToPermission(id, requestId, response);
